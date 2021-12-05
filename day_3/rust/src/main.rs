@@ -4,8 +4,7 @@ use std::fs::File;
 use std::io::Read;
 
 
-
-const LINE_SIZE: usize = 12;
+const LINE_SIZE: usize = 40;
 
 
 fn read_file(path: PathBuf) -> Result<String, std::io::Error> {
@@ -19,37 +18,38 @@ fn read_file(path: PathBuf) -> Result<String, std::io::Error> {
 
 fn parse_input(input : &str) -> Vec<[u8; LINE_SIZE]> {
 
-    let input_size = input.lines().count();
-    let mut output = Vec::with_capacity(input_size);
+    let mut output = Vec::with_capacity(input.len() / (LINE_SIZE + 1) + 100);
 
-    for line in input.lines() {
+    for line in input.as_bytes().chunks(LINE_SIZE + 1) {
 
         let mut line_content = [0; LINE_SIZE];
+        let mut idx = 0;
 
-        for (idx, ch) in line.trim().chars().enumerate() {
-            
-            line_content[idx] = (ch == '1') as u8;
+        for ch in &line[..LINE_SIZE] {
+
+            line_content[idx] = ((*ch) == ('1' as u8)) as u8;
+            idx += 1;
         }
 
         output.push(line_content);
-    }   
+    }
 
     return output;
 }
 
 fn count_bits(input: &Vec<[u8; LINE_SIZE]>) -> [u32; LINE_SIZE] {
 
-    let mut bit_count: [u32; LINE_SIZE] = [0; LINE_SIZE];
-
-    for line in input.iter() {
-
-        for idx in 0..LINE_SIZE {
-
-            bit_count[idx] += line[idx] as u32;
+    return input.iter().fold([0; LINE_SIZE], 
+        |state, line| {
+            
+            let mut output = [0; LINE_SIZE];
+            for (idx, (a, b)) in state.iter().zip(line.iter()).enumerate() {
+                output[idx] = *a + (*b as u32);
+            }
+    
+            return output;
         }
-    }
-
-    return bit_count;
+    )
 }
 
 fn bits_to_number(input: &[u8; LINE_SIZE]) -> u64 {
