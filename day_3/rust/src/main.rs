@@ -114,13 +114,26 @@ fn filter_lines(mut input: Vec<[u8; LINE_SIZE]>, value_to_filter: u8, position: 
 }
 
 
+fn measure<T>(func: impl FnOnce() -> T) -> (u128, T) {
+
+    let before = std::time::Instant::now();
+    let output = func();
+    let after = std::time::Instant::now();
+
+    return ((after - before).as_nanos(), output);
+}
+
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let raw_input = read_file("./input.txt".into())?;
     let input = parse_input(&raw_input);
 
-    println!("part 1 result: {}", calculate_part_1(&input));
-    println!("part 2 result: {}", calculate_part_2(&input));
+    let part_1 = measure(|| calculate_part_1(&input));
+    let part_2 = measure(|| calculate_part_2(&input));
+    
+    println!("part 1 | result: {}, time: {}", part_1.1, part_1.0);
+    println!("part 2 | result: {}, time: {}", part_2.1, part_2.0);
 
     return Ok(());
 }
