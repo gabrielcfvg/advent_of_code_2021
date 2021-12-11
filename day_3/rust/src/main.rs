@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::Read;
 
 
-const LINE_SIZE: usize = 40;
+const LINE_SIZE: usize = 12;
 
 
 fn read_file(path: PathBuf) -> Result<String, std::io::Error> {
