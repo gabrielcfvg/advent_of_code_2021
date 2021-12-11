@@ -153,14 +153,25 @@ fn calculate_part_2(input: &(Vec<u16>, Vec<Board>)) -> u64 {
 }
 
 
+fn measure<T>(func: impl FnOnce() -> T) -> (u128, T) {
+
+    let before = std::time::Instant::now();
+    let output = func();
+    let after = std::time::Instant::now();
+    return ((after - before).as_nanos(), output);
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     let filename = "./input.txt";
     let raw_input = read_file(&filename.into())?;
     let input = parse_input(&raw_input)?;
 
-    println!("part 1 result: {}", calculate_part_1(&input));
-    println!("part 2 result: {}", calculate_part_2(&input));
+    let part1 = measure(|| calculate_part_1(&input));
+    let part2 = measure(|| calculate_part_2(&input));
+
+    println!("part 1 | result: {}, time: {}ns", part1.1, part1.0);
+    println!("part 2 | result: {}, time: {}ns", part2.1, part2.0);
 
     return Ok(());
 }
