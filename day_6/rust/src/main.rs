@@ -23,8 +23,7 @@ fn parse_input(input: &str) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
 
 fn calculate(init_fishes: &Vec<u8>, day_count: u64) -> u64 {
 
-    let mut fishes = vec![];
-    fishes.resize(9, 0);
+    let mut fishes = [0; 9];
 
     for fish in init_fishes.iter() {
 
