@@ -5,7 +5,6 @@ use std::fs::File;
 use std::io::Read;
 
 use regex::Regex;
-use hashbrown::HashMap;
 
 
 fn read_file(path: &PathBuf) -> Result<String, std::io::Error> {
@@ -64,6 +63,30 @@ impl Sub for Vec2 {
     }
 }
 
+struct Map {
+
+    size: Vec2,
+    data: Vec<u32>
+}
+
+impl Map {
+
+    pub fn new(size: Vec2) -> Self {
+
+        let mut data = Vec::new();
+        data.resize(size.x as usize * size.y as usize, 0);
+
+        return Self{
+            size,
+            data
+        };
+    }
+
+    pub fn get(&mut self, pos: Vec2) -> &mut u32 {
+
+        return self.data.get_mut((self.size.x as usize* pos.y as usize) + pos.x as usize).unwrap();
+    }
+}
 
 fn parse_input(input: &str) -> Vec<(Vec2, Vec2)> {
 
@@ -93,20 +116,6 @@ fn min_max(value: i64, min: i64, max: i64) -> i64 {
 
 fn calculate(input: &Vec<(Vec2, Vec2)>) -> u64 {
 
-    type Map = HashMap<Vec2, u32>;
-    let reduce_map = |mut a: Map, b: Map| -> Map {
-
-        for (key, value) in a.iter_mut() {
-            
-            if let Some(b_value) = b.get(&key) {
-
-                *value += *b_value;
-            }
-        }
-
-        return a;
-    };
-
     let insert_line = |map: &mut Map, line: &(Vec2, Vec2)| {
 
         let mut current_position = line.0;
@@ -116,23 +125,36 @@ fn calculate(input: &Vec<(Vec2, Vec2)>) -> u64 {
         
         loop {
         
-            *map.entry(current_position).or_insert(0) += 1;
+            *map.get(current_position) += 1;
             
             current_position.x = (current_position.x as i64 + x_dir) as u32;
             current_position.y = (current_position.y as i64 + y_dir) as u32;
             
             if current_position == line.1 {
                 
-                *map.entry(current_position).or_insert(0) += 1;
+                *map.get(current_position) += 1;
                 break;
             }
         }
     };
 
+    let x_size = input.iter().flat_map(|lines| [lines.0.x, lines.1.x]).fold(0, |sum, x| if x > sum { x } else { sum }) + 1;
+    let y_size = input.iter().flat_map(|lines| [lines.0.y, lines.1.y]).fold(0, |sum, y| if y > sum { y } else { sum }) + 1;
 
-    return input.iter()
-        .fold(HashMap::new(), |mut map, line| {insert_line(&mut map, line); map})
-        .iter().fold(0, |sum, (_, value)| if *value >= 2 { sum + 1 } else { sum }) as u64;
+    let mut map = input.iter().fold(Map::new(Vec2::new(x_size, y_size)), |mut map, line| {insert_line(&mut map, line); map});
+
+    let mut total = 0;
+    for x in 0..x_size {
+        for y in 0..y_size {
+
+            if *map.get(Vec2::new(x, y)) >= 2 {
+
+                total += 1;
+            }
+        }
+    }
+
+    return total;
 }
 
 
