@@ -148,7 +148,7 @@ fn measure<T>(func: impl FnOnce() -> T) -> (u128, T) {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     
-    let filename = "./input.txt";
+    let filename = std::env::args().nth(1).unwrap_or("./input.txt".to_owned());
     let raw_input = read_file(&filename.into())?;
     let input = parse_input(&raw_input);
 
