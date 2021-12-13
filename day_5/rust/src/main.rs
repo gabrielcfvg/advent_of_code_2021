@@ -66,7 +66,7 @@ impl Sub for Vec2 {
 struct Map {
 
     size: Vec2,
-    data: Vec<u32>
+    data: Vec<u8>
 }
 
 impl Map {
@@ -82,7 +82,7 @@ impl Map {
         };
     }
 
-    pub fn get(&mut self, pos: Vec2) -> &mut u32 {
+    pub fn get(&mut self, pos: Vec2) -> &mut u8 {
 
         return self.data.get_mut((self.size.x as usize* pos.y as usize) + pos.x as usize).unwrap();
     }
