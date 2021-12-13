@@ -65,7 +65,7 @@ fn calculate_part_1(input: &Vec<[u8; LINE_SIZE]>) -> u64 {
     let gamma_rate: u64 = bits_to_number(&bit_count.map(|number| (number >= (input_size / 2) as u32) as u8));
     let epsilon_rate = gamma_rate ^ (u64::MAX >> (64 - LINE_SIZE));
 
-    return gamma_rate * epsilon_rate;
+    return (gamma_rate as u128 * epsilon_rate as u128) as u64;
 }
 
 fn calculate_part_2(input: &Vec<[u8; LINE_SIZE]>) -> u64 {
@@ -90,7 +90,7 @@ fn calculate_part_2(input: &Vec<[u8; LINE_SIZE]>) -> u64 {
     let oxygen = bits_to_number(&filter_input(&mut |num, input_size| (!(num >= ((input_size as u32) - num))) as u8));
     let co2 = bits_to_number(&filter_input(&mut |num, input_size| (!(num < ((input_size as u32) - num))) as u8));
 
-    return oxygen * co2;
+    return (oxygen as u128 * co2 as u128) as u64;
 }
 
 fn filter_lines(mut input: Vec<[u8; LINE_SIZE]>, value_to_filter: u8, position: usize) -> Vec<[u8; LINE_SIZE]> {
@@ -126,7 +126,8 @@ fn measure<T>(func: impl FnOnce() -> T) -> (u128, T) {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 
-    let raw_input = read_file("./input.txt".into())?;
+    let filename = std::env::args().nth(1).unwrap_or("./input.txt".to_owned());
+    let raw_input = read_file(filename.into())?;
     let input = parse_input(&raw_input);
 
     let part_1 = measure(|| calculate_part_1(&input));
